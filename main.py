@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
-import os
+imporimporysj os
 
 TOKEN = os.getenv("BOT_TOKEN")
 
