@@ -21,7 +21,7 @@ async def is_joined(context, user_id):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
         [InlineKeyboardButton("🔔 Join Channel @FilmViralindob", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
-        [InlineKeyboardButton("✅ Saya sudah join", callback_data="check_join")]
+        [InlineKeyboardButton("✅ saya sudah join", callback_data="check_join")]
     ]
 
     await update.message.reply_text(
@@ -44,9 +44,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
             keyboard = [
-    [InlineKeyboardButton("🔗 Klik Shopee", url="https://shopee.co.id/https://s.shopee.co.id/5fmSeHsTg5)],
-    [InlineKeyboardButton("✅ Konfirmasi", callback_data="confirm_ad")]
-]
+                [InlineKeyboardButton("🔗 Klik Shopee", callback_data="click_ad")],
+                [InlineKeyboardButton("✅ Konfirmasi", callback_data="confirm_ad")]
+            ]
 
             await query.message.reply_text(
                 "Klik iklan terlebih dahulu 👇",
