@@ -44,9 +44,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
             keyboard = [
-                [InlineKeyboardButton("🔗 Klik Shopee", callback_data="click_ad")],
-                [InlineKeyboardButton("✅ Konfirmasi", callback_data="confirm_ad")]
-            ]
+    [InlineKeyboardButton("🔗 Klik Shopee", url="http://103.178.153.206:8080/s?dest=https%3A%2F%2Fs.shopee.co.id%2F8ATnWJ7fRR")],
+    [InlineKeyboardButton("✅ Konfirmasi", callback_data="confirm_ad")]
+]
 
             await query.message.reply_text(
                 "Klik iklan terlebih dahulu 👇",
