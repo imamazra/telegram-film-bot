@@ -1,13 +1,11 @@
-import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
-from config import BOT_TOKEN, CHANNEL_USERNAME, SHOPEE_LINKS, FILM_VIDEOS
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
+import os
+
 from database import user_state
+from config import BOT_TOKEN, CHANNEL_USERNAME
 
-
-# =========================
-# CEK JOIN CHANNEL
-# =========================
+# ---------------- CHECK JOIN ----------------
 async def is_joined(context, user_id):
     try:
         member = await context.bot.get_chat_member(
@@ -19,96 +17,65 @@ async def is_joined(context, user_id):
         return False
 
 
-# =========================
-# START
-# =========================
+# ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
-
     keyboard = [
-        [InlineKeyboardButton("🔴 JOIN CHANNEL", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
-        [InlineKeyboardButton("✅ SUDAH JOIN", callback_data="check_join")]
+        [InlineKeyboardButton("🔔 Join @FilmViralindob", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
+        [InlineKeyboardButton("✅ saya sudah join", callback_data="check_join")]
     ]
 
     await update.message.reply_text(
-        "📢 Wajib join channel dulu sebelum lanjut:",
+        "Wajib join channel dulu sebelum lanjut 👇",
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
 
-# =========================
-# CHECK JOIN
-# =========================
-async def check_join(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# ---------------- HANDLE CALLBACK ----------------
+async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
     user_id = query.from_user.id
 
-    if await is_joined(context, user_id):
+    # STEP 1: CEK JOIN
+    if query.data == "check_join":
+        if await is_joined(context, user_id):
+            await query.message.reply_text(
+                "🔥 Join berhasil!\n\nSekarang klik iklan dulu sebelum lanjut"
+            )
 
-        user_state[user_id] = "joined"
+            keyboard = [
+                [InlineKeyboardButton("🔗 Klik Shopee", callback_data="click_ad")],
+                [InlineKeyboardButton("✅ Konfirmasi", callback_data="confirm_ad")]
+            ]
 
-        keyboard = [
-            [InlineKeyboardButton("🛒 KLIK SHOPEE", callback_data="shopee")]
-        ]
+            await query.message.reply_text(
+                "Klik iklan terlebih dahulu 👇",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        else:
+            await query.message.reply_text("❌ Kamu belum join channel!")
 
-        await query.message.reply_text(
-            "✅ Kamu sudah join!\nLanjut klik tombol di bawah:",
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-    else:
-        await query.message.reply_text("❌ Kamu belum join channel!")
+    # STEP 2: CLICK AD
+    elif query.data == "click_ad":
+        user_state[user_id] = {"ad_clicked": True}
+        await query.message.reply_text("✔ Iklan tercatat, lanjut konfirmasi")
 
+    # STEP 3: CONFIRM
+    elif query.data == "confirm_ad":
+        state = user_state.get(user_id, {})
 
-# =========================
-# SHOPEE STEP
-# =========================
-async def shopee(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    user_id = query.from_user.id
-
-    if user_state.get(user_id) != "joined":
-        await query.message.reply_text("❌ Kamu belum valid join")
-        return
-
-    keyboard = [
-        [InlineKeyboardButton("✅ KONFIRMASI", callback_data="confirm")]
-    ]
-
-    await query.message.reply_text(
-        "📌 Klik Shopee dulu untuk lanjut:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+        if state.get("ad_clicked"):
+            await query.message.reply_text(
+                "🎬 UNLOCK BERHASIL!\n👉 https://t.me/linkfilmkamu"
+            )
+        else:
+            await query.message.reply_text("❌ Klik iklan dulu sebelum konfirmasi!")
 
 
-# =========================
-# CONFIRM (FINAL UNLOCK)
-# =========================
-async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    user_id = query.from_user.id
-
-    video = random.choice(FILM_VIDEOS)
-    link = random.choice(SHOPEE_LINKS)
-
-    await query.message.reply_text(
-        f"🎬 VIDEO:\n{video}\n\n🛒 LINK:\n{link}"
-    )
-
-
-# =========================
-# APP SETUP
-# =========================
+# ---------------- RUN BOT ----------------
 app = Application.builder().token(BOT_TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CallbackQueryHandler(check_join, pattern="check_join"))
-app.add_handler(CallbackQueryHandler(shopee, pattern="shopee"))
-app.add_handler(CallbackQueryHandler(confirm, pattern="confirm"))
+app.add_handler(CallbackQueryHandler(handle_callback))
 
 app.run_polling()
