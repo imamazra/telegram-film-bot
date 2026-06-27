@@ -41,7 +41,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if await is_joined(context, user_id):
 
             keyboard = [
-                [InlineKeyboardButton("🟡 Klik Shopee", url="https://shopee.co.id")],
+                [InlineKeyboardButton("🟡 Klik Shopee", url="https://bit.ly/3Sot4Fo")],
                 [InlineKeyboardButton("✅ Konfirmasi", callback_data="confirm_ad")]
             ]
 
