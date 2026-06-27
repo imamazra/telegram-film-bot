@@ -62,8 +62,8 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # kalau sudah join
         keyboard = [
             [InlineKeyboardButton(
-                "🟡 Klik Shopee Sponsor",
-                url="https://shopee.co.id"
+                "🟡 Klik Shopee",
+                url="https://bit.ly/4oNz7zi"
             )],
             [InlineKeyboardButton("✅ Saya Sudah Lihat", callback_data="confirm_ad")]
         ]
