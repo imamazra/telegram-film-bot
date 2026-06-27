@@ -20,7 +20,7 @@ async def is_joined(context, user_id):
 # ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🔔 Join Channel", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
+        [InlineKeyboardButton("🔔 Join Channel @FilmViralIndo", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
         [InlineKeyboardButton("✅ Saya Sudah Join", callback_data="check_join")]
     ]
 
