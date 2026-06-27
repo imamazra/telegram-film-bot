@@ -1,9 +1,9 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, CallbackQueryHandler, MessageHandler, filters, ContextTypes
-import os
+from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 from database import user_state
 from config import BOT_TOKEN, CHANNEL_USERNAME
+
 
 # ---------------- CHECK JOIN ----------------
 async def is_joined(context, user_id):
@@ -20,8 +20,8 @@ async def is_joined(context, user_id):
 # ---------------- START ----------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🔔 join @FilmViralindob", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
-        [InlineKeyboardButton("✅ sudah join", callback_data="check_join")]
+        [InlineKeyboardButton("🔔 Join Channel", url=f"https://t.me/{CHANNEL_USERNAME.replace('@','')}")],
+        [InlineKeyboardButton("✅ Saya Sudah Join", callback_data="check_join")]
     ]
 
     await update.message.reply_text(
@@ -39,40 +39,31 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # STEP 1: CEK JOIN
     if query.data == "check_join":
         if await is_joined(context, user_id):
-            await query.message.reply_text(
-                "🔥 Join berhasil!\n\nSekarang klik iklan dulu sebelum lanjut"
-            )
 
             keyboard = [
-                InlineKeyboardButton(
-    "🟡 Klik Shopee",
-    url="https://shopee.co.id"
-),
+                [InlineKeyboardButton("🟡 Klik Shopee", url="https://shopee.co.id")],
                 [InlineKeyboardButton("✅ Konfirmasi", callback_data="confirm_ad")]
             ]
 
             await query.message.reply_text(
-                "Klik iklan terlebih dahulu 👇",
+                "🔥 Join berhasil!\nSekarang klik tombol Shopee dulu sebelum lanjut 👇",
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
+
         else:
             await query.message.reply_text("❌ Kamu belum join channel!")
 
-    # STEP 2: CLICK AD
-    elif query.data == "click_ad":
-        user_state[user_id] = {"ad_clicked": True}
-        await query.message.reply_text("✔ Iklan tercatat, lanjut konfirmasi")
-
-    # STEP 3: CONFIRM
+    # STEP 2: KONFIRMASI (tanpa tracking click ad karena Telegram tidak bisa detect URL click)
     elif query.data == "confirm_ad":
-        state = user_state.get(user_id, {})
 
-        if state.get("ad_clicked"):
-            await query.message.reply_text(
-                "🎬 UNLOCK BERHASIL!\n👉 https://t.me/linkfilmkamu"
-            )
-        else:
-            await query.message.reply_text("❌ Klik iklan dulu sebelum konfirmasi!")
+        keyboard = [
+            [InlineKeyboardButton("🎬 Buka Film", url="https://t.me/linkfilmkamu")]
+        ]
+
+        await query.message.reply_text(
+            "🎉 Akses dibuka",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
 
 
 # ---------------- RUN BOT ----------------
